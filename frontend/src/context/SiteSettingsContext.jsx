@@ -27,7 +27,10 @@ export function SiteSettingsProvider({ children }) {
 
   useEffect(() => {
     getSiteSettings()
-      .then((data) => setSettings(data))
+      // A misconfigured VITE_API_BASE_URL (or a 200 response that isn't the
+      // expected JSON shape, e.g. the SPA's own index.html) must never crash
+      // the whole app — fall back to defaults instead of rendering `undefined`.
+      .then((data) => setSettings(data && typeof data === 'object' ? data : FALLBACK_SETTINGS))
       .catch(() => setSettings(FALLBACK_SETTINGS))
       .finally(() => setIsLoading(false));
   }, []);
