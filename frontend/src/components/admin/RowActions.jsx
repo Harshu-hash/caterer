@@ -22,7 +22,7 @@ export default function RowActions({ onEdit, onDelete, itemLabel = 'this record'
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       <button type="button" onClick={onEdit} className="text-maroon font-medium hover:underline">
         Edit
       </button>

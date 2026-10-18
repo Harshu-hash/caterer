@@ -7,7 +7,6 @@ import {
   listMenuItems,
   listPackages,
   listGalleryItems,
-  listTestimonials,
   listEvents,
   listReviews,
 } from '../controllers/publicController.js';
@@ -29,7 +28,6 @@ router.get('/menu-categories', listMenuCategories);
 router.get('/menu-items', listMenuItems);
 router.get('/packages', listPackages);
 router.get('/gallery', listGalleryItems);
-router.get('/testimonials', listTestimonials);
 router.get('/events', listEvents);
 router.get('/reviews', listReviews);
 

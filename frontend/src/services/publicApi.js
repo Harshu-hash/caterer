@@ -14,8 +14,6 @@ export const getPackages = () => apiClient.get('/packages').then((r) => r.data.d
 
 export const getGalleryItems = (params) => apiClient.get('/gallery', { params }).then((r) => r.data);
 
-export const getTestimonials = () => apiClient.get('/testimonials').then((r) => r.data.data);
-
 export const getEvents = (params) => apiClient.get('/events', { params }).then((r) => r.data);
 
 export const getReviews = (params) => apiClient.get('/reviews', { params }).then((r) => r.data);

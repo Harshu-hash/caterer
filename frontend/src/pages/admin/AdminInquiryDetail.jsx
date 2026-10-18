@@ -53,8 +53,8 @@ export default function AdminInquiryDetail() {
     <div className="max-w-4xl">
       <Link to="/admin/inquiries" className="text-sm text-maroon hover:underline">&larr; Back to Inquiries</Link>
 
-      <div className="flex items-center justify-between mt-4 mb-6">
-        <h1 className="font-display text-2xl text-espresso">{inquiry.name}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-4 mb-6">
+        <h1 className="font-display text-2xl text-espresso break-words">{inquiry.name}</h1>
         <StatusPill status={inquiry.status} />
       </div>
 
@@ -137,9 +137,9 @@ function InfoCard({ title, children, className = '' }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="flex justify-between text-sm py-1.5 border-b border-border-beige last:border-0">
-      <span className="text-brown-muted">{label}</span>
-      <span className="text-espresso font-medium">{value}</span>
+    <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 text-sm py-1.5 border-b border-border-beige last:border-0">
+      <span className="text-brown-muted shrink-0">{label}</span>
+      <span className="text-espresso font-medium text-right break-words min-w-0">{value}</span>
     </div>
   );
 }

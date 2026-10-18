@@ -118,7 +118,7 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       </FormField>
       <FormField label="Event Type (optional)"><input {...register('eventType')} className="form-input" placeholder="e.g. Wedding, Exhibition" /></FormField>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Starts At" error={errors.startDateTime?.message}>
           <input type="datetime-local" {...register('startDateTime', { required: 'Start date/time is required' })} className="form-input" />
         </FormField>

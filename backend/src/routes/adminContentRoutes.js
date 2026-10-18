@@ -8,7 +8,6 @@ import MenuCategory from '../models/MenuCategory.js';
 import MenuItem from '../models/MenuItem.js';
 import Package from '../models/Package.js';
 import GalleryItem from '../models/GalleryItem.js';
-import Testimonial from '../models/Testimonial.js';
 import Event from '../models/Event.js';
 import Review from '../models/Review.js';
 
@@ -18,7 +17,6 @@ import {
   menuItemSchema,
   packageSchema,
   galleryItemSchema,
-  testimonialSchema,
   eventSchema,
   reviewSchema,
 } from '../validators/contentValidators.js';
@@ -43,7 +41,6 @@ registerCrudRoutes('/menu-items', MenuItem, menuItemSchema, {
 });
 registerCrudRoutes('/packages', Package, packageSchema, { slugSource: 'name' });
 registerCrudRoutes('/gallery', GalleryItem, galleryItemSchema, { slugSource: 'title' });
-registerCrudRoutes('/testimonials', Testimonial, testimonialSchema, { slugSource: 'customerName' });
 registerCrudRoutes('/events', Event, eventSchema, { slugSource: 'title' });
 registerCrudRoutes('/reviews', Review, reviewSchema, { slugSource: 'name' });
 

@@ -19,7 +19,6 @@ export const menuCategoriesApi = buildResource('menu-categories');
 export const menuItemsApi = buildResource('menu-items');
 export const packagesApi = buildResource('packages');
 export const galleryApi = buildResource('gallery');
-export const testimonialsApi = buildResource('testimonials');
 export const eventsApi = buildResource('events');
 export const reviewsApi = buildResource('reviews');
 

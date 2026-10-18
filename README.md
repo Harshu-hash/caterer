@@ -60,14 +60,14 @@ ever talks to port 5173 and admin auth cookies work same-origin.
 - Public site: http://localhost:5173
 - Admin login: http://localhost:5173/admin/login (use the account from `npm run create-admin`)
 
-All services, menu items, packages, gallery photos, testimonials, and site settings (business name,
+All services, menu items, packages, gallery photos, reviews, and site settings (business name,
 contact info, hero image, etc.) are managed from the admin dashboard — nothing is hard-coded except
 generic marketing copy that should be reviewed and replaced with the real business's content before
 launch (see `About.jsx`, `WhyChooseUs.jsx`, and the legal pages).
 
 ## 4. What's placeholder and must be replaced before launch
 
-- `npm run seed` content (services, dishes, packages, gallery photos, testimonials) is demo data with
+- `npm run seed` content (services, dishes, packages, gallery photos, reviews) is demo data with
   `picsum.photos` placeholder images.
 - Homepage "Why Choose Us" copy and About page copy are generic — replace with confirmed, real
   business claims.

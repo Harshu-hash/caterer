@@ -96,15 +96,6 @@ export const reviewSchema = z.object({
   sortOrder: z.coerce.number().optional().default(0),
 });
 
-export const testimonialSchema = z.object({
-  customerName: z.string().trim().min(1).max(120),
-  eventType: z.string().optional().default(''),
-  review: z.string().trim().min(2).max(2000),
-  eventDate: z.coerce.date().optional(),
-  published: z.coerce.boolean().optional().default(false),
-  sortOrder: z.coerce.number().optional().default(0),
-});
-
 export const siteSettingsSchema = z.object({
   businessName: z.string().trim().min(1).max(160).optional(),
   logo: z.string().optional(),

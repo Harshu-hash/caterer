@@ -9,7 +9,6 @@ import MenuCategory from '../src/models/MenuCategory.js';
 import MenuItem from '../src/models/MenuItem.js';
 import Package from '../src/models/Package.js';
 import GalleryItem from '../src/models/GalleryItem.js';
-import Testimonial from '../src/models/Testimonial.js';
 import SiteSettings from '../src/models/SiteSettings.js';
 
 const PLACEHOLDER_IMG = (seed, w = 1200, h = 800) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -23,7 +22,6 @@ async function main() {
     MenuItem.deleteMany({}),
     Package.deleteMany({}),
     GalleryItem.deleteMany({}),
-    Testimonial.deleteMany({}),
     SiteSettings.deleteMany({}),
   ]);
 
@@ -124,19 +122,6 @@ async function main() {
         sortOrder: i,
       }))
     )
-  );
-
-  await Testimonial.insertMany(
-    [
-      { customerName: 'Placeholder Customer A', eventType: 'Wedding' },
-      { customerName: 'Placeholder Customer B', eventType: 'Corporate Event' },
-      { customerName: 'Placeholder Customer C', eventType: 'Birthday Party' },
-    ].map((t, i) => ({
-      ...t,
-      review: 'Placeholder testimonial text. Replace with a real, approved customer review.',
-      published: true,
-      sortOrder: i,
-    }))
   );
 
   console.log('Seed complete. Services:', services.length);

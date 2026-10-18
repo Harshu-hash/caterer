@@ -194,7 +194,7 @@
     background-image: linear-gradient(90deg, var(--color-gold) 0%, var(--color-gold-bright) 50%, var(--color-gold) 100%);
   }
 
-  /* Elevated card used across service/menu/package/testimonial cards */
+  /* Elevated card used across service/menu/package/review cards */
   .card-elevated {
     transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
   }

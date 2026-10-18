@@ -38,7 +38,6 @@ export default function Footer() {
           <h4 className="eyebrow text-gold mb-4">Company</h4>
           <ul className="space-y-2 text-sm text-ivory/80">
             <li><Link to="/reviews" className="hover:text-gold transition-colors">Reviews</Link></li>
-            <li><Link to="/testimonials" className="hover:text-gold transition-colors">Testimonials</Link></li>
             <li><Link to="/contact" className="hover:text-gold transition-colors">Contact</Link></li>
             <li><Link to="/privacy-policy" className="hover:text-gold transition-colors">Privacy Policy</Link></li>
             <li><Link to="/terms" className="hover:text-gold transition-colors">Terms</Link></li>

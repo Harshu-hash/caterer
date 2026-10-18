@@ -75,10 +75,10 @@ export default function AdminDashboard() {
             <Link
               key={inquiry._id}
               to={`/admin/inquiries/${inquiry._id}`}
-              className="flex items-center justify-between px-5 py-4 hover:bg-ivory/40"
+              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-4 hover:bg-ivory/40"
             >
-              <div>
-                <p className="font-medium text-espresso">{inquiry.name}</p>
+              <div className="min-w-0">
+                <p className="font-medium text-espresso break-words">{inquiry.name}</p>
                 <p className="text-xs text-brown-muted">
                   {inquiry.eventType} &middot; {inquiry.guestCount ? `${inquiry.guestCount} guests` : 'Guest count TBD'}
                 </p>

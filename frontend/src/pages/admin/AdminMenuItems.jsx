@@ -122,7 +122,7 @@ function MenuItemForm({ categories, initialValues, onSubmit, onCancel }) {
         </select>
       </FormField>
       <FormField label="Description"><textarea {...register('description')} rows={3} className="form-input" /></FormField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Cuisine"><input {...register('cuisine')} className="form-input" /></FormField>
         <FormField label="Price (optional)"><input type="number" {...register('price')} className="form-input" /></FormField>
       </div>
@@ -144,7 +144,7 @@ function MenuItemForm({ categories, initialValues, onSubmit, onCancel }) {
 
       <ImageUploadField label="Dish Image" value={image} onChange={(url) => setValue('image', url)} />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label className="flex items-center gap-2 text-sm text-espresso">
           <input type="checkbox" {...register('availability')} /> Available
         </label>

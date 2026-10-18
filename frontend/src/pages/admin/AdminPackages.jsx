@@ -104,7 +104,7 @@ function PackageForm({ initialValues, onSubmit, onCancel }) {
     <form onSubmit={handleSubmit(submit)} className="space-y-4">
       <FormField label="Name"><input {...register('name', { required: true })} className="form-input" /></FormField>
       <FormField label="Description"><textarea {...register('description')} rows={3} className="form-input" /></FormField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <FormField label="Starting Price (optional)"><input type="number" {...register('startingPrice')} className="form-input" /></FormField>
         <FormField label="Minimum Guests (optional)"><input type="number" {...register('minGuests')} className="form-input" /></FormField>
       </div>

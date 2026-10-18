@@ -1,5 +1,5 @@
 // Seeds the still-empty content collections (Services, Packages, Gallery,
-// Testimonials) with placeholder-but-realistic content for Shree Sanware
+// Reviews) with placeholder-but-realistic content for Shree Sanware
 // Sarkar Caters and Supervision. Does NOT touch MenuCategory/MenuItem (real
 // menu already seeded via seed-menu.js), Event (admin-entered already), or
 // SiteSettings (already updated with real business info).
@@ -10,7 +10,6 @@ import { connectDB } from '../src/config/db.js';
 import Service from '../src/models/Service.js';
 import Package from '../src/models/Package.js';
 import GalleryItem from '../src/models/GalleryItem.js';
-import Testimonial from '../src/models/Testimonial.js';
 import Review from '../src/models/Review.js';
 
 const PLACEHOLDER_IMG = (seed, w = 1200, h = 800) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
@@ -18,11 +17,10 @@ const PLACEHOLDER_IMG = (seed, w = 1200, h = 800) => `https://picsum.photos/seed
 async function main() {
   await connectDB();
 
-  const [serviceCount, packageCount, galleryCount, testimonialCount, reviewCount] = await Promise.all([
+  const [serviceCount, packageCount, galleryCount, reviewCount] = await Promise.all([
     Service.countDocuments({}),
     Package.countDocuments({}),
     GalleryItem.countDocuments({}),
-    Testimonial.countDocuments({}),
     Review.countDocuments({}),
   ]);
 
@@ -147,27 +145,6 @@ async function main() {
     console.log(`Seeded ${items.length} gallery items.`);
   } else {
     console.log('Gallery already has data, skipping.');
-  }
-
-  if (testimonialCount === 0) {
-    const testimonials = [
-      { customerName: 'Placeholder Customer A', eventType: 'Wedding' },
-      { customerName: 'Placeholder Customer B', eventType: 'Corporate Event' },
-      { customerName: 'Placeholder Customer C', eventType: 'Birthday Party' },
-      { customerName: 'Placeholder Customer D', eventType: 'Engagement Ceremony' },
-    ];
-
-    await Testimonial.insertMany(
-      testimonials.map((t, i) => ({
-        ...t,
-        review: 'Placeholder testimonial text. Replace with a real, approved customer review before launch.',
-        published: true,
-        sortOrder: i,
-      }))
-    );
-    console.log(`Seeded ${testimonials.length} testimonials.`);
-  } else {
-    console.log('Testimonials already have data, skipping.');
   }
 
   if (reviewCount === 0) {

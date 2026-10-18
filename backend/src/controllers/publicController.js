@@ -7,7 +7,6 @@ import MenuCategory from '../models/MenuCategory.js';
 import MenuItem from '../models/MenuItem.js';
 import Package from '../models/Package.js';
 import GalleryItem from '../models/GalleryItem.js';
-import Testimonial from '../models/Testimonial.js';
 import Event from '../models/Event.js';
 import Review from '../models/Review.js';
 import SiteSettings from '../models/SiteSettings.js';
@@ -97,11 +96,6 @@ export const listGalleryItems = asyncHandler(async (req, res) => {
   ]);
 
   paginated(res, items, { page, limit, total });
-});
-
-export const listTestimonials = asyncHandler(async (_req, res) => {
-  const testimonials = await Testimonial.find({ published: true }).sort({ sortOrder: 1, createdAt: -1 });
-  ok(res, testimonials);
 });
 
 function withTimingStatus(event) {
