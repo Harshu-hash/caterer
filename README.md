@@ -74,14 +74,48 @@ launch (see `About.jsx`, `WhyChooseUs.jsx`, and the legal pages).
 - Privacy Policy and Terms pages are starting templates, not legal advice — have them reviewed.
 - `JWT_SECRET` in `.env` must be changed from the example value.
 
-## 5. Production deployment (summary)
+## 5. Deploying to Vercel
 
-See `premium_indian_catering_website_plan.md` section 14 for full detail. In short:
-1. Build the frontend: `cd frontend && npm run build` → serve `frontend/dist` via Nginx.
-2. Run the backend with `pm2 start src/server.js --name caterer-api` (or similar) behind Nginx.
-3. Proxy `/api/*` and `/uploads/*` from Nginx to the Node process; serve the SPA for everything else.
-4. Use MongoDB Atlas with network restrictions and a least-privilege database user.
-5. Set `NODE_ENV=production`, real secrets, and HTTPS via Let's Encrypt/Certbot.
+Backend and frontend deploy as **two separate Vercel projects** from this one repo (a standard
+monorepo setup — each project points at a different "Root Directory").
+
+### 5a. Backend project
+
+1. In Vercel, "Add New Project" → import this repo → set **Root Directory** to `backend`.
+2. Framework preset: "Other" (no build step needed — `backend/api/index.js` is a serverless function
+   that wraps the Express app, routed to by `backend/vercel.json`).
+3. Add environment variables (Project Settings → Environment Variables), same keys as `.env.example`:
+   - `MONGODB_URI` — use MongoDB Atlas (a local Mongo instance isn't reachable from Vercel)
+   - `JWT_SECRET`, `JWT_EXPIRES_IN`, `COOKIE_NAME`
+   - `CLIENT_ORIGIN` — the frontend's deployed URL (set this *after* deploying the frontend; comma-
+     separate multiple origins if you need to allow a preview URL too)
+   - `STORAGE_PROVIDER=cloudinary` plus the three `CLOUDINARY_*` values (local disk storage doesn't
+     work on Vercel's read-only filesystem — see "Notes on image uploads" below)
+   - `EMAIL_*` / `NOTIFY_TO_EMAIL` if you want inquiry notification emails
+4. Deploy. Your API is now live at `https://<backend-project>.vercel.app/api/v1/...`.
+5. Run `npm run seed`, `npm run create-admin` etc. locally against the same `MONGODB_URI` (point your
+   local `.env` at the Atlas connection string) — these scripts aren't meant to run on Vercel itself.
+
+### 5b. Frontend project
+
+1. "Add New Project" → import this repo again → set **Root Directory** to `frontend`.
+2. Framework preset: "Vite" (auto-detected; build command `npm run build`, output `dist`).
+3. Add environment variable `VITE_API_BASE_URL` = `https://<backend-project>.vercel.app/api/v1`
+   (this is baked in at build time — set it before deploying, and redeploy if you change it).
+4. Deploy. `frontend/vercel.json` adds the SPA fallback rewrite so client-side routes like `/menu` or
+   `/admin` work on a hard refresh/direct link.
+
+### 5c. Wire them together
+
+Go back to the **backend** project's env vars and set `CLIENT_ORIGIN` to the frontend URL from step
+5b, then redeploy the backend (env var changes require a redeploy to take effect).
+
+### Known serverless caveats
+
+- `express-rate-limit`'s default in-memory store is per-instance, not shared across concurrent
+  serverless invocations — fine for small/medium traffic, but not a precise global rate limit.
+- Each warm function instance reuses its MongoDB connection (see `src/config/db.js`); cold starts open
+  a new one. This is normal for serverless and works fine with Atlas's connection limits at small scale.
 
 ## Notes on image uploads
 
@@ -93,7 +127,9 @@ Images are uploaded through `src/services/storage/index.js`, which picks an adap
   `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in `.env`.
 - `local` — stores images on disk under `backend/uploads/` (served at `/uploads/...`). Useful for
   local development without a Cloudinary account. `backend/uploads/` is excluded from source control
-  and would need its own backup strategy in production.
+  and would need its own backup strategy in production. **Not usable on Vercel** — its filesystem is
+  read-only outside `/tmp`, and writes there don't persist between invocations anyway. Always use
+  `STORAGE_PROVIDER=cloudinary` when deploying to Vercel.
 
 Every upload is validated server-side by file type, actual image content (magic bytes), and size
 (5MB max, JPEG/PNG/WebP only) before it reaches either adapter. Each `Media` record stores which

@@ -5,7 +5,11 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   cookieName: process.env.COOKIE_NAME || 'caterer_token',
-  clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  // Comma-separated list supported, e.g. "https://app.vercel.app,https://app-git-preview.vercel.app"
+  clientOrigins: (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean),
   storageProvider: process.env.STORAGE_PROVIDER || 'local',
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,

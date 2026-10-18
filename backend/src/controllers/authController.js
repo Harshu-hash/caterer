@@ -14,7 +14,10 @@ function setAuthCookie(res, admin) {
   res.cookie(env.cookieName, token, {
     httpOnly: true,
     secure: env.nodeEnv === 'production',
-    sameSite: env.nodeEnv === 'production' ? 'strict' : 'lax',
+    // Frontend and backend are deployed as separate Vercel projects on
+    // different domains, so the auth cookie must be sent cross-site.
+    // "none" requires "secure: true", which is already set above in prod.
+    sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   });
@@ -42,7 +45,11 @@ export const login = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie(env.cookieName, { path: '/' });
+  res.clearCookie(env.cookieName, {
+    path: '/',
+    secure: env.nodeEnv === 'production',
+    sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
+  });
   ok(res, null, 'Logged out successfully');
 });
 

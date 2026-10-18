@@ -23,7 +23,15 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientOrigin,
+    origin(origin, callback) {
+      // Allow server-to-server/no-Origin requests (curl, health checks) and
+      // any origin explicitly allow-listed via CLIENT_ORIGIN.
+      if (!origin || env.clientOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
