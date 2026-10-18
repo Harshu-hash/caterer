@@ -79,12 +79,18 @@ launch (see `About.jsx`, `WhyChooseUs.jsx`, and the legal pages).
 Backend and frontend deploy as **two separate Vercel projects** from this one repo (a standard
 monorepo setup — each project points at a different "Root Directory").
 
+**Important:** do not set `NODE_ENV` as an environment variable on either Vercel project. Vercel sets
+it to `production` automatically at runtime; explicitly adding `NODE_ENV=development` (e.g. by copying
+the whole `.env.example` file into the dashboard) silently overrides that and breaks the admin login
+cookie (see "Admin auth cookie" below).
+
 ### 5a. Backend project
 
 1. In Vercel, "Add New Project" → import this repo → set **Root Directory** to `backend`.
 2. Framework preset: "Other" (no build step needed — `backend/api/index.js` is a serverless function
    that wraps the Express app, routed to by `backend/vercel.json`).
-3. Add environment variables (Project Settings → Environment Variables), same keys as `.env.example`:
+3. Add environment variables (Project Settings → Environment Variables) — every key from
+   `.env.example` **except `NODE_ENV`**:
    - `MONGODB_URI` — use MongoDB Atlas (a local Mongo instance isn't reachable from Vercel)
    - `JWT_SECRET`, `JWT_EXPIRES_IN`, `COOKIE_NAME`
    - `CLIENT_ORIGIN` — the frontend's deployed URL (set this *after* deploying the frontend; comma-
@@ -100,15 +106,26 @@ monorepo setup — each project points at a different "Root Directory").
 
 1. "Add New Project" → import this repo again → set **Root Directory** to `frontend`.
 2. Framework preset: "Vite" (auto-detected; build command `npm run build`, output `dist`).
-3. Add environment variable `VITE_API_BASE_URL` = `https://<backend-project>.vercel.app/api/v1`
-   (this is baked in at build time — set it before deploying, and redeploy if you change it).
-4. Deploy. `frontend/vercel.json` adds the SPA fallback rewrite so client-side routes like `/menu` or
-   `/admin` work on a hard refresh/direct link.
+3. Leave `VITE_API_BASE_URL` as `/api/v1` (the `.env.example` default) — do **not** point it at the
+   backend's full URL. `frontend/vercel.json` proxies `/api/*` to the backend's domain server-side
+   (edit the `destination` there if the backend project's URL ever changes), so the browser only ever
+   talks to the frontend's own domain. This keeps the admin auth cookie same-origin and avoids
+   cross-site cookie blocking between two separate `*.vercel.app` subdomains entirely.
+4. Deploy. `frontend/vercel.json`'s second rewrite adds the SPA fallback so client-side routes like
+   `/menu` or `/admin` work on a hard refresh/direct link.
 
 ### 5c. Wire them together
 
 Go back to the **backend** project's env vars and set `CLIENT_ORIGIN` to the frontend URL from step
 5b, then redeploy the backend (env var changes require a redeploy to take effect).
+
+### Admin auth cookie
+
+The admin login sets an `httpOnly` cookie. In production it's `SameSite=None; Secure` so it would
+survive a genuine cross-site request — but the `frontend/vercel.json` proxy above means the browser
+never makes a cross-site request to begin with, which is the more robust fix (some browsers restrict
+or block third-party cookies between separate domains even with correct `SameSite`/`Secure`
+attributes, regardless of server-side config).
 
 ### Known serverless caveats
 
