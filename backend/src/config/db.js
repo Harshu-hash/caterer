@@ -18,7 +18,15 @@ export async function connectDB() {
     mongoose.set('strictQuery', true);
 
     connectionPromise = mongoose
-      .connect(uri)
+      .connect(uri, {
+        // A serverless function instance handles requests mostly one at a
+        // time, so a large pool just adds idle-connection overhead.
+        maxPoolSize: 5,
+        // Fail fast instead of letting queries hang indefinitely if the
+        // cluster is unreachable or still connecting.
+        serverSelectionTimeoutMS: 8000,
+        bufferCommands: false,
+      })
       .then((conn) => {
         console.log(`MongoDB connected: ${mongoose.connection.host}/${mongoose.connection.name}`);
         return conn;
