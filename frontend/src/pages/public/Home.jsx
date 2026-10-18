@@ -7,7 +7,7 @@ import FeaturedMenu from '../../components/home/FeaturedMenu';
 import GalleryPreview from '../../components/home/GalleryPreview';
 import PackagesOverview from '../../components/home/PackagesOverview';
 import WhyChooseUs from '../../components/home/WhyChooseUs';
-import TestimonialsSection from '../../components/home/TestimonialsSection';
+import ReviewsCarousel from '../../components/home/ReviewsCarousel';
 import InquiryCTA from '../../components/home/InquiryCTA';
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
       <GalleryPreview />
       <PackagesOverview />
       <WhyChooseUs />
-      <TestimonialsSection />
+      <ReviewsCarousel />
       <InquiryCTA />
     </>
   );

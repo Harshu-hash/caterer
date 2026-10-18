@@ -11,17 +11,19 @@ import Service from '../src/models/Service.js';
 import Package from '../src/models/Package.js';
 import GalleryItem from '../src/models/GalleryItem.js';
 import Testimonial from '../src/models/Testimonial.js';
+import Review from '../src/models/Review.js';
 
 const PLACEHOLDER_IMG = (seed, w = 1200, h = 800) => `https://picsum.photos/seed/${seed}/${w}/${h}`;
 
 async function main() {
   await connectDB();
 
-  const [serviceCount, packageCount, galleryCount, testimonialCount] = await Promise.all([
+  const [serviceCount, packageCount, galleryCount, testimonialCount, reviewCount] = await Promise.all([
     Service.countDocuments({}),
     Package.countDocuments({}),
     GalleryItem.countDocuments({}),
     Testimonial.countDocuments({}),
+    Review.countDocuments({}),
   ]);
 
   if (serviceCount === 0) {
@@ -166,6 +168,28 @@ async function main() {
     console.log(`Seeded ${testimonials.length} testimonials.`);
   } else {
     console.log('Testimonials already have data, skipping.');
+  }
+
+  if (reviewCount === 0) {
+    const reviews = [
+      { name: 'Placeholder Guest A', rating: 5 },
+      { name: 'Placeholder Guest B', rating: 5 },
+      { name: 'Placeholder Guest C', rating: 4 },
+      { name: 'Placeholder Guest D', rating: 5 },
+      { name: 'Placeholder Guest E', rating: 4 },
+    ];
+
+    await Review.insertMany(
+      reviews.map((r, i) => ({
+        ...r,
+        reviewText: 'Placeholder review text. Replace with a real, approved visitor review before launch.',
+        status: 'approved',
+        sortOrder: i,
+      }))
+    );
+    console.log(`Seeded ${reviews.length} reviews.`);
+  } else {
+    console.log('Reviews already have data, skipping.');
   }
 
   await mongoose.disconnect();

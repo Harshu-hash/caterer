@@ -18,4 +18,8 @@ export const getTestimonials = () => apiClient.get('/testimonials').then((r) => 
 
 export const getEvents = (params) => apiClient.get('/events', { params }).then((r) => r.data);
 
+export const getReviews = (params) => apiClient.get('/reviews', { params }).then((r) => r.data);
+
 export const submitInquiry = (payload) => apiClient.post('/inquiries', payload).then((r) => r.data);
+
+export const submitReview = (payload) => apiClient.post('/reviews', payload).then((r) => r.data);

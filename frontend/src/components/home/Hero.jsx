@@ -75,7 +75,7 @@ export default function Hero() {
 
       <div className="container-page relative py-32 text-ivory">
         <p className="eyebrow text-gold-light mb-4 animate-fade-up" style={{ animationDelay: '80ms' }}>
-          Premium Indian Catering &amp; Events
+          {hero.eyebrow || 'Premium Indian Catering & Events'}
         </p>
         <h1 className="font-display text-4xl md:text-6xl font-semibold max-w-3xl leading-tight animate-fade-up" style={{ animationDelay: '200ms' }}>
           <span className="gold-shine-text">{hero.headline}</span>
@@ -86,12 +86,27 @@ export default function Hero() {
           </p>
         )}
         <div className="mt-10 flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: '460ms' }}>
-          <PrimaryButton to="/get-a-quote" className="btn-gold">
-            Get a Quote
+          <PrimaryButton to="/events" className="btn-gold">
+            Live Events
           </PrimaryButton>
           <SecondaryButton to="/menu" className="border-ivory/60 text-ivory hover:bg-ivory hover:text-maroon-deep">
             Explore Our Menu
           </SecondaryButton>
+          {settings.socialLinks?.instagram && (
+            <SecondaryButton
+              href={settings.socialLinks.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-ivory/60 text-ivory hover:bg-ivory hover:text-maroon-deep"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+              Instagram
+            </SecondaryButton>
+          )}
         </div>
       </div>
 

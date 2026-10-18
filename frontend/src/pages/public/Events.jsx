@@ -7,6 +7,7 @@ import EventCard, { FeaturedEventCard } from '../../components/events/EventCard'
 import SectionHeading from '../../components/common/SectionHeading';
 import Reveal from '../../components/common/Reveal';
 import Pagination from '../../components/common/Pagination';
+import ReviewForm from '../../components/reviews/ReviewForm';
 import { LoadingState, ErrorState, EmptyState } from '../../components/common/States';
 import { getEvents } from '../../services/publicApi';
 
@@ -87,6 +88,13 @@ export default function Events() {
             <Pagination page={page} totalPages={pagination?.totalPages} onChange={setPage} />
           </div>
         )}
+
+        <div>
+          <SectionHeading eyebrow="Been to One of Our Events?" title="Share Your Experience" align="center" />
+          <div className="mt-10 max-w-xl mx-auto">
+            <ReviewForm />
+          </div>
+        </div>
       </section>
     </>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
+import logo from '../../assets/logo-optimized.png';
 
 const NAV_LINKS = [
   { to: '/about', label: 'About' },
@@ -33,12 +34,17 @@ export default function Header() {
       }`}
     >
       <div className="container-page flex items-center justify-between gap-4 h-18 py-3">
-        <NavLink
-          to="/"
-          title={settings.businessName}
-          className={`font-logo gold-shine-text font-extrabold tracking-wide transition-all duration-300 min-w-0 truncate ${isScrolled ? 'text-base lg:text-lg xl:text-xl' : 'text-lg lg:text-xl xl:text-2xl'}`}
-        >
-          {settings.businessName}
+        <NavLink to="/" title={settings.businessName} className="flex items-center gap-3 min-w-0">
+          <img
+            src={logo}
+            alt=""
+            className={`shrink-0 object-contain transition-all duration-300 ${isScrolled ? 'h-10 w-10' : 'h-12 w-12'}`}
+          />
+          <span
+            className={`hidden sm:inline font-logo gold-shine-text font-extrabold tracking-wide transition-all duration-300 min-w-0 truncate ${isScrolled ? 'text-base lg:text-lg xl:text-xl' : 'text-lg lg:text-xl xl:text-2xl'}`}
+          >
+            {settings.businessName}
+          </span>
         </NavLink>
 
         <nav className="hidden lg:flex items-center gap-4 xl:gap-7 shrink-0" aria-label="Primary">

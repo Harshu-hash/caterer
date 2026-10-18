@@ -28,12 +28,14 @@ export function errorHandler(err, req, res, _next) {
     message = 'Invalid identifier supplied';
   }
 
-  if (statusCode === 500 && env.nodeEnv === 'production') {
-    message = 'Something went wrong. Please try again later.';
+  // Always log 500s server-side (this is what shows up in Vercel's function
+  // logs) — only the message sent back to the client is genericized in prod.
+  if (statusCode === 500) {
+    console.error(err);
   }
 
-  if (env.nodeEnv !== 'production' && statusCode === 500) {
-    console.error(err);
+  if (statusCode === 500 && env.nodeEnv === 'production') {
+    message = 'Something went wrong. Please try again later.';
   }
 
   res.status(statusCode).json({

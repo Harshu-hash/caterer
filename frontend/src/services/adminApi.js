@@ -21,6 +21,7 @@ export const packagesApi = buildResource('packages');
 export const galleryApi = buildResource('gallery');
 export const testimonialsApi = buildResource('testimonials');
 export const eventsApi = buildResource('events');
+export const reviewsApi = buildResource('reviews');
 
 export const inquiriesApi = {
   list: (params) => apiClient.get('/admin/inquiries', { params }).then((r) => r.data),

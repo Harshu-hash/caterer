@@ -10,7 +10,12 @@ const FALLBACK_SETTINGS = {
   serviceArea: '',
   operatingHours: '',
   socialLinks: {},
-  hero: { headline: "An Artful Feast for Life's Grandest Celebrations", subheading: '', image: '' },
+  hero: {
+    eyebrow: 'Premium Indian Catering & Events',
+    headline: "An Artful Feast for Life's Grandest Celebrations",
+    subheading: '',
+    image: '',
+  },
   brandStory: {
     eyebrow: 'Our Story',
     title: 'Tradition, Presented with Understated Luxury',

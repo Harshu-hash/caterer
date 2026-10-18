@@ -19,6 +19,17 @@ export const inquiryLimiter = rateLimit({
   },
 });
 
+export const reviewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many reviews submitted from this device. Please try again later.',
+  },
+});
+
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,

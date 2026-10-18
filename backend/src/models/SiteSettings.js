@@ -19,6 +19,7 @@ const siteSettingsSchema = new mongoose.Schema(
       youtube: { type: String, default: '' },
     },
     hero: {
+      eyebrow: { type: String, default: 'Premium Indian Catering & Events' },
       headline: { type: String, default: "An Artful Feast for Life's Grandest Celebrations" },
       subheading: { type: String, default: '' },
       image: { type: String, default: '' },

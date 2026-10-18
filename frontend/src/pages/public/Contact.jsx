@@ -4,6 +4,7 @@ import Breadcrumbs from '../../components/common/Breadcrumbs';
 import { PrimaryButton } from '../../components/common/Buttons';
 import { useSiteSettings } from '../../context/SiteSettingsContext';
 import Reveal from '../../components/common/Reveal';
+import SocialLinks from '../../components/common/SocialLinks';
 
 export default function Contact() {
   useSeo({ title: 'Contact Us | Shree Sanware Sarkar Caters and Supervision', description: 'Get in touch for catering inquiries and event planning.' });
@@ -35,6 +36,10 @@ export default function Contact() {
           <div>
             <h3 className="eyebrow mb-2">Operating Hours</h3>
             <p className="text-espresso text-lg">{settings.operatingHours || 'Hours coming soon'}</p>
+          </div>
+          <div>
+            <h3 className="eyebrow mb-2">Follow Us</h3>
+            <SocialLinks className="mt-2" />
           </div>
         </Reveal>
 

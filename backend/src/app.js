@@ -9,6 +9,7 @@ import path from 'node:path';
 import { env } from './config/env.js';
 import { apiLimiter } from './middleware/rateLimit.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import { ApiError } from './utils/ApiError.js';
 
 import publicRoutes from './routes/publicRoutes.js';
 import authRoutes from './routes/authRoutes.js';
@@ -29,7 +30,7 @@ app.use(
       if (!origin || env.clientOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new ApiError(403, `Origin not allowed by CORS: ${origin}`));
       }
     },
     credentials: true,

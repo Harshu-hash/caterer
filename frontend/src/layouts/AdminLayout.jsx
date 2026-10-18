@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import logo from '../assets/logo-optimized.png';
 
 const NAV_ITEMS = [
   { to: '/admin', label: 'Dashboard', end: true },
@@ -11,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/admin/events', label: 'Events' },
   { to: '/admin/gallery', label: 'Gallery' },
   { to: '/admin/testimonials', label: 'Testimonials' },
+  { to: '/admin/reviews', label: 'Reviews' },
   { to: '/admin/media', label: 'Media Library' },
   { to: '/admin/settings', label: 'Website Settings' },
 ];
@@ -27,7 +29,8 @@ export default function AdminLayout() {
   return (
     <div className="h-screen flex bg-ivory overflow-hidden">
       <aside className="w-64 h-screen overflow-y-auto wine-surface text-ivory flex flex-col shrink-0">
-        <div className="px-5 py-6 border-b border-gold/15">
+        <div className="px-5 py-6 border-b border-gold/15 flex items-center gap-3">
+          <img src={logo} alt="" className="h-10 w-10 object-contain shrink-0" />
           <p className="font-display text-xl gold-shine-text">Admin Panel</p>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Admin navigation">

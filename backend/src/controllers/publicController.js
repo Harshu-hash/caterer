@@ -9,6 +9,7 @@ import Package from '../models/Package.js';
 import GalleryItem from '../models/GalleryItem.js';
 import Testimonial from '../models/Testimonial.js';
 import Event from '../models/Event.js';
+import Review from '../models/Review.js';
 import SiteSettings from '../models/SiteSettings.js';
 
 export const getSiteSettings = asyncHandler(async (_req, res) => {
@@ -126,4 +127,16 @@ export const listEvents = asyncHandler(async (req, res) => {
   ]);
 
   paginated(res, events.map(withTimingStatus), { page, limit, total });
+});
+
+export const listReviews = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = getPagination(req.query, { defaultLimit: 9, maxLimit: 60 });
+  const filter = { status: 'approved' };
+
+  const [reviews, total] = await Promise.all([
+    Review.find(filter).sort({ sortOrder: 1, createdAt: -1 }).skip(skip).limit(limit),
+    Review.countDocuments(filter),
+  ]);
+
+  paginated(res, reviews, { page, limit, total });
 });

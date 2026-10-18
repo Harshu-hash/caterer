@@ -49,7 +49,7 @@ function SettingsForm({ initialValues, onSubmit }) {
       businessName: '', address: '', serviceArea: '', operatingHours: '',
       contact: { phone: '', email: '', whatsApp: '' },
       socialLinks: { instagram: '', facebook: '', youtube: '' },
-      hero: { headline: '', subheading: '', image: '' },
+      hero: { eyebrow: '', headline: '', subheading: '', image: '' },
       brandStory: { eyebrow: '', title: '', description: '', image: '' },
       footer: { aboutText: '' },
     },
@@ -102,6 +102,7 @@ function SettingsForm({ initialValues, onSubmit }) {
 
       <section className="bg-white border border-border-beige p-6 space-y-4">
         <h2 className="font-display text-xl text-espresso">Homepage Hero</h2>
+        <FormField label="Eyebrow (small text above the headline)"><input {...register('hero.eyebrow')} className="form-input" /></FormField>
         <FormField label="Headline"><input {...register('hero.headline')} className="form-input" /></FormField>
         <FormField label="Subheading"><textarea {...register('hero.subheading')} rows={2} className="form-input" /></FormField>
         <ImageUploadField label="Hero Image" value={heroImage} onChange={(url) => setValue('hero.image', url)} />

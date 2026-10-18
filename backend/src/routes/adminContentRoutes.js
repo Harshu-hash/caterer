@@ -10,6 +10,7 @@ import Package from '../models/Package.js';
 import GalleryItem from '../models/GalleryItem.js';
 import Testimonial from '../models/Testimonial.js';
 import Event from '../models/Event.js';
+import Review from '../models/Review.js';
 
 import {
   serviceSchema,
@@ -19,6 +20,7 @@ import {
   galleryItemSchema,
   testimonialSchema,
   eventSchema,
+  reviewSchema,
 } from '../validators/contentValidators.js';
 
 const router = Router();
@@ -43,5 +45,6 @@ registerCrudRoutes('/packages', Package, packageSchema, { slugSource: 'name' });
 registerCrudRoutes('/gallery', GalleryItem, galleryItemSchema, { slugSource: 'title' });
 registerCrudRoutes('/testimonials', Testimonial, testimonialSchema, { slugSource: 'customerName' });
 registerCrudRoutes('/events', Event, eventSchema, { slugSource: 'title' });
+registerCrudRoutes('/reviews', Review, reviewSchema, { slugSource: 'name' });
 
 export default router;

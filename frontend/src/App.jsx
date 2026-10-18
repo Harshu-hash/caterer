@@ -19,6 +19,7 @@ import Packages from './pages/public/Packages';
 import Events from './pages/public/Events';
 import Gallery from './pages/public/Gallery';
 import Testimonials from './pages/public/Testimonials';
+import Reviews from './pages/public/Reviews';
 import Contact from './pages/public/Contact';
 import GetAQuote from './pages/public/GetAQuote';
 import PrivacyPolicy from './pages/public/PrivacyPolicy';
@@ -36,6 +37,7 @@ import AdminPackages from './pages/admin/AdminPackages';
 import AdminEvents from './pages/admin/AdminEvents';
 import AdminGallery from './pages/admin/AdminGallery';
 import AdminTestimonials from './pages/admin/AdminTestimonials';
+import AdminReviews from './pages/admin/AdminReviews';
 import AdminMedia from './pages/admin/AdminMedia';
 import AdminSettings from './pages/admin/AdminSettings';
 
@@ -58,6 +60,7 @@ export default function App() {
                   <Route path="/events" element={<Events />} />
                   <Route path="/gallery" element={<Gallery />} />
                   <Route path="/testimonials" element={<Testimonials />} />
+                  <Route path="/reviews" element={<Reviews />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/get-a-quote" element={<GetAQuote />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -79,6 +82,7 @@ export default function App() {
                     <Route path="events" element={<AdminEvents />} />
                     <Route path="gallery" element={<AdminGallery />} />
                     <Route path="testimonials" element={<AdminTestimonials />} />
+                    <Route path="reviews" element={<AdminReviews />} />
                     <Route path="media" element={<AdminMedia />} />
                     <Route path="settings" element={<AdminSettings />} />
                   </Route>

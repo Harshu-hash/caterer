@@ -88,6 +88,14 @@ export const eventSchema = z.object({
   sortOrder: z.coerce.number().optional().default(0),
 });
 
+export const reviewSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  rating: z.coerce.number().int().min(1).max(5),
+  reviewText: z.string().trim().min(2).max(2000),
+  status: z.enum(['pending', 'approved', 'rejected']).optional().default('pending'),
+  sortOrder: z.coerce.number().optional().default(0),
+});
+
 export const testimonialSchema = z.object({
   customerName: z.string().trim().min(1).max(120),
   eventType: z.string().optional().default(''),
@@ -120,6 +128,7 @@ export const siteSettingsSchema = z.object({
     .optional(),
   hero: z
     .object({
+      eyebrow: z.string().optional(),
       headline: z.string().optional(),
       subheading: z.string().optional(),
       image: z.string().optional(),
