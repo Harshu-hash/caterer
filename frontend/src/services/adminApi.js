@@ -1,7 +1,12 @@
-import { apiClient } from './apiClient';
+import { apiClient, setStoredAdminToken, clearStoredAdminToken } from './apiClient';
 
-export const adminLogin = (payload) => apiClient.post('/admin/auth/login', payload).then((r) => r.data);
-export const adminLogout = () => apiClient.post('/admin/auth/logout').then((r) => r.data);
+export const adminLogin = (payload) =>
+  apiClient.post('/admin/auth/login', payload).then((r) => {
+    if (r.data?.data?.token) setStoredAdminToken(r.data.data.token);
+    return r.data;
+  });
+export const adminLogout = () =>
+  apiClient.post('/admin/auth/logout').then((r) => r.data).finally(clearStoredAdminToken);
 export const adminMe = () => apiClient.get('/admin/auth/me').then((r) => r.data.data);
 
 function buildResource(path) {

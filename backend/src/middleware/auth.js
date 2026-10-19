@@ -5,7 +5,8 @@ import AdminUser from '../models/AdminUser.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const requireAdmin = asyncHandler(async (req, res, next) => {
-  const token = req.cookies?.[env.cookieName];
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
   if (!token) {
     throw new ApiError(401, 'Authentication required');

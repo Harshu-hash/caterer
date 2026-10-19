@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import compression from 'compression';
 import path from 'node:path';
@@ -26,19 +25,19 @@ app.use(
   cors({
     origin(origin, callback) {
       // Allow server-to-server/no-Origin requests (curl, health checks) and
-      // any origin explicitly allow-listed via CLIENT_ORIGIN.
+      // any origin explicitly allow-listed via CLIENT_ORIGIN. No cookies are
+      // involved in admin auth (token-in-header instead), so credentials
+      // don't need to be enabled here.
       if (!origin || env.clientOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new ApiError(403, `Origin not allowed by CORS: ${origin}`));
       }
     },
-    credentials: true,
   })
 );
 app.use(compression());
 app.use(express.json({ limit: '1mb' }));
-app.use(cookieParser());
 if (env.nodeEnv !== 'test') {
   app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 }

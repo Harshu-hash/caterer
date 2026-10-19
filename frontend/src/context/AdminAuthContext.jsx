@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { adminLogin, adminLogout, adminMe } from '../services/adminApi';
+import { getStoredAdminToken } from '../services/apiClient';
 
 const AdminAuthContext = createContext(null);
 
@@ -8,6 +9,13 @@ export function AdminAuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Skip the /me check entirely when there's no stored token — this also
+    // avoids a pointless 401 firing on every public page load, since this
+    // provider wraps the whole app, not just the admin routes.
+    if (!getStoredAdminToken()) {
+      setIsLoading(false);
+      return;
+    }
     adminMe()
       .then((data) => setAdmin(data))
       .catch(() => setAdmin(null))

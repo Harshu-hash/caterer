@@ -6,23 +6,6 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ok } from '../utils/apiResponse.js';
 import AdminUser from '../models/AdminUser.js';
 
-function setAuthCookie(res, admin) {
-  const token = jwt.sign({ sub: admin._id.toString() }, env.jwtSecret, {
-    expiresIn: env.jwtExpiresIn,
-  });
-
-  res.cookie(env.cookieName, token, {
-    httpOnly: true,
-    secure: env.nodeEnv === 'production',
-    // Frontend and backend are deployed as separate Vercel projects on
-    // different domains, so the auth cookie must be sent cross-site.
-    // "none" requires "secure: true", which is already set above in prod.
-    sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    path: '/',
-  });
-}
-
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -39,17 +22,20 @@ export const login = asyncHandler(async (req, res) => {
   admin.lastLoginAt = new Date();
   await admin.save();
 
-  setAuthCookie(res, admin);
+  // Token goes straight in the response body and the client attaches it as
+  // an `Authorization: Bearer` header on every request. No cookie involved,
+  // so there's nothing for SameSite rules, third-party-cookie blocking, or
+  // a stale cache to break — the frontend explicitly controls when the
+  // token is sent.
+  const token = jwt.sign({ sub: admin._id.toString() }, env.jwtSecret, {
+    expiresIn: env.jwtExpiresIn,
+  });
 
-  ok(res, { id: admin._id, name: admin.name, email: admin.email }, 'Logged in successfully');
+  ok(res, { token, id: admin._id, name: admin.name, email: admin.email }, 'Logged in successfully');
 });
 
-export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie(env.cookieName, {
-    path: '/',
-    secure: env.nodeEnv === 'production',
-    sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
-  });
+export const logout = asyncHandler(async (_req, res) => {
+  // Nothing to clear server-side — the client just discards its stored token.
   ok(res, null, 'Logged out successfully');
 });
 

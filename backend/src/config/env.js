@@ -4,7 +4,6 @@ export const env = {
   mongodbUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  cookieName: process.env.COOKIE_NAME || 'caterer_token',
   // Comma-separated list supported, e.g. "https://app.vercel.app,https://app-git-preview.vercel.app"
   clientOrigins: (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
     .split(',')
