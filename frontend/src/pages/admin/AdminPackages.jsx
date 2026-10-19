@@ -91,7 +91,7 @@ function PackageForm({ initialValues, onSubmit, onCancel }) {
   const image = watch('image');
 
   function submit(values) {
-    onSubmit({
+    return onSubmit({
       ...values,
       startingPrice: values.startingPrice === '' ? undefined : Number(values.startingPrice),
       minGuests: values.minGuests === '' ? undefined : Number(values.minGuests),

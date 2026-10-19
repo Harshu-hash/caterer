@@ -98,7 +98,7 @@ function ServiceForm({ initialValues, onSubmit, onCancel }) {
   const image = watch('image');
 
   function submit(values) {
-    onSubmit({
+    return onSubmit({
       ...values,
       features: values.features.split('\n').map((f) => f.trim()).filter(Boolean),
     });

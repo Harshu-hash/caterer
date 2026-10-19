@@ -68,7 +68,7 @@ export default function EventDetail() {
       />
       <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Events', to: '/events' }, { label: event.title }]} />
 
-      <section className="container-page py-16">
+      <section className="container-page pt-2 pb-16">
         <div className="grid md:grid-cols-3 gap-12">
           <div className="md:col-span-2">
             {isLive && (

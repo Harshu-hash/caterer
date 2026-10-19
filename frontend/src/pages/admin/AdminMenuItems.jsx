@@ -107,7 +107,7 @@ function MenuItemForm({ categories, initialValues, onSubmit, onCancel }) {
   }
 
   function submit(values) {
-    onSubmit({ ...values, price: values.price === '' ? undefined : Number(values.price) });
+    return onSubmit({ ...values, price: values.price === '' ? undefined : Number(values.price) });
   }
 
   return (

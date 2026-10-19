@@ -189,7 +189,7 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
   const image = watch('image');
 
   function submit(values) {
-    onSubmit({
+    return onSubmit({
       ...values,
       endDateTime: values.endDateTime || undefined,
       menuHighlights: values.menuHighlights.split('\n').map((v) => v.trim()).filter(Boolean),
