@@ -10,6 +10,7 @@ const eventSchema = new mongoose.Schema(
     venueAddress: { type: String, default: '' },
     description: { type: String, default: '' },
     menuHighlights: [{ type: String }],
+    dishes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MenuItem' }],
     image: { type: String, default: '' },
     status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     sortOrder: { type: Number, default: 0 },

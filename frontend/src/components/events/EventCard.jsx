@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { PinIcon, ClockIcon, PlateIcon } from './icons';
 
 const DAY_FMT = new Intl.DateTimeFormat('en-IN', { day: '2-digit' });
@@ -50,7 +51,7 @@ export function FeaturedEventCard({ event }) {
   const highlights = event.menuHighlights || [];
 
   return (
-    <div className="relative p-[2px] overflow-hidden">
+    <Link to={`/events/${event._id}`} className="relative block p-[2px] overflow-hidden">
       {/* Slowly rotating gold conic gradient, visible only as a thin animated border */}
       <div
         aria-hidden="true"
@@ -99,7 +100,7 @@ export function FeaturedEventCard({ event }) {
         </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -110,7 +111,10 @@ export default function EventCard({ event }) {
   const highlights = event.menuHighlights || [];
 
   return (
-    <div className="shine-hover card-elevated group bg-white border border-border-beige flex flex-col sm:flex-row overflow-hidden">
+    <Link
+      to={`/events/${event._id}`}
+      className="shine-hover card-elevated group bg-white border border-border-beige flex flex-col sm:flex-row overflow-hidden"
+    >
       {/* Date stub */}
       <div className="sm:w-28 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-5 py-4 sm:py-6 relative">
         <span className="text-xs uppercase tracking-widest text-gold-light">{WEEKDAY_FMT.format(start)}</span>
@@ -148,6 +152,6 @@ export default function EventCard({ event }) {
 
         {isPast && <p className="text-xs text-brown-muted mt-4 italic">This event has concluded.</p>}
       </div>
-    </div>
+    </Link>
   );
 }

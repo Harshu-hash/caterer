@@ -45,6 +45,16 @@ export function buildAdminCrud(Model, schema, { slugSource = 'name', populate = 
     if (!existing) throw new ApiError(404, 'Record not found');
 
     const data = { ...req.body };
+    // A field with `.optional().default(x)` in the Zod schema still gets
+    // filled in with `x` when the key is simply absent from a partial PATCH
+    // body — `.partial()` only makes fields optional, it doesn't suppress
+    // `.default()`. Without this guard, omitting a field from a PATCH would
+    // silently reset it to the schema default instead of leaving it alone.
+    const sentKeys = new Set(req.rawBodyKeys || Object.keys(data));
+    for (const key of Object.keys(data)) {
+      if (!sentKeys.has(key)) delete data[key];
+    }
+
     if (data.slug) {
       data.slug = await generateUniqueSlug(Model, data.slug, existing._id);
     }

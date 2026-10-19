@@ -123,6 +123,15 @@ export const listEvents = asyncHandler(async (req, res) => {
   paginated(res, events.map(withTimingStatus), { page, limit, total });
 });
 
+export const getEventById = asyncHandler(async (req, res) => {
+  const event = await Event.findOne({ _id: req.params.id, status: 'published' })
+    .populate('dishes', 'name slug image description cuisine dietaryTags price')
+    .lean();
+  if (!event) throw new ApiError(404, 'Event not found');
+
+  ok(res, withTimingStatus(event));
+});
+
 export const listReviews = asyncHandler(async (req, res) => {
   const { page, limit, skip } = getPagination(req.query, { defaultLimit: 9, maxLimit: 60 });
   const filter = { status: 'approved' };

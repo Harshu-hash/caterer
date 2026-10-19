@@ -8,6 +8,7 @@ import {
   listPackages,
   listGalleryItems,
   listEvents,
+  getEventById,
   listReviews,
 } from '../controllers/publicController.js';
 import { createInquiry } from '../controllers/inquiryController.js';
@@ -29,6 +30,7 @@ router.get('/menu-items', listMenuItems);
 router.get('/packages', listPackages);
 router.get('/gallery', listGalleryItems);
 router.get('/events', listEvents);
+router.get('/events/:id', getEventById);
 router.get('/reviews', listReviews);
 
 router.post('/inquiries', inquiryLimiter, validateBody(createInquirySchema), createInquiry);

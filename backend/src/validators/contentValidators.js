@@ -83,6 +83,7 @@ export const eventSchema = z.object({
   venueAddress: z.string().optional().default(''),
   description: z.string().optional().default(''),
   menuHighlights: z.array(z.string()).optional().default([]),
+  dishes: z.array(z.string()).optional().default([]),
   image: z.string().optional().default(''),
   status: z.enum(['draft', 'published']).optional().default('draft'),
   sortOrder: z.coerce.number().optional().default(0),

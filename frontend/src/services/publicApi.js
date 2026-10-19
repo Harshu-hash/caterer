@@ -16,6 +16,8 @@ export const getGalleryItems = (params) => apiClient.get('/gallery', { params })
 
 export const getEvents = (params) => apiClient.get('/events', { params }).then((r) => r.data);
 
+export const getEventById = (id) => apiClient.get(`/events/${id}`).then((r) => r.data.data);
+
 export const getReviews = (params) => apiClient.get('/reviews', { params }).then((r) => r.data);
 
 export const submitInquiry = (payload) => apiClient.post('/inquiries', payload).then((r) => r.data);

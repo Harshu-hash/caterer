@@ -24,12 +24,20 @@ import {
 const router = Router();
 router.use(requireAdmin);
 
+// Stashes which keys the client actually sent before validateBody replaces
+// req.body with the Zod-parsed (and default-filled) version — see the
+// comment in adminCrudFactory.js's update handler for why this matters.
+function captureRawBodyKeys(req, res, next) {
+  req.rawBodyKeys = Object.keys(req.body || {});
+  next();
+}
+
 function registerCrudRoutes(basePath, Model, schema, options) {
   const { list, getOne, create, update, remove } = buildAdminCrud(Model, schema, options);
   router.get(basePath, list);
   router.get(`${basePath}/:id`, getOne);
   router.post(basePath, validateBody(schema), create);
-  router.patch(`${basePath}/:id`, validateBody(schema.partial()), update);
+  router.patch(`${basePath}/:id`, captureRawBodyKeys, validateBody(schema.partial()), update);
   router.delete(`${basePath}/:id`, remove);
 }
 
@@ -41,7 +49,10 @@ registerCrudRoutes('/menu-items', MenuItem, menuItemSchema, {
 });
 registerCrudRoutes('/packages', Package, packageSchema, { slugSource: 'name' });
 registerCrudRoutes('/gallery', GalleryItem, galleryItemSchema, { slugSource: 'title' });
-registerCrudRoutes('/events', Event, eventSchema, { slugSource: 'title' });
+registerCrudRoutes('/events', Event, eventSchema, {
+  slugSource: 'title',
+  populate: { path: 'dishes', select: 'name image dietaryTags' },
+});
 registerCrudRoutes('/reviews', Review, reviewSchema, { slugSource: 'name' });
 
 export default router;

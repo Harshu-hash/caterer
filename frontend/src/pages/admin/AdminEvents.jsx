@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { eventsApi } from '../../services/adminApi';
+import { getMenuItems } from '../../services/publicApi';
 import { useAdminResource } from '../../hooks/useAdminResource';
 import { useToast } from '../../components/common/Toast';
 import { extractErrorMessage } from '../../services/apiClient';
@@ -32,7 +33,7 @@ export default function AdminEvents() {
     <div>
       <AdminPageHeader
         title="Events"
-        description="Manage live and upcoming events, venues, and featured menus."
+        description="Manage live and upcoming events, venues, and featured dishes."
         action={<button type="button" onClick={resource.openCreateForm} className="btn-primary">Add Event</button>}
       />
 
@@ -45,6 +46,7 @@ export default function AdminEvents() {
               { key: 'title', header: 'Title' },
               { key: 'startDateTime', header: 'Date & Time', render: (r) => DATE_FMT.format(new Date(r.startDateTime)) },
               { key: 'venueName', header: 'Venue' },
+              { key: 'dishes', header: 'Dishes', render: (r) => r.dishes?.length || 0 },
               { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
               {
                 key: 'actions', header: '', render: (r) => (
@@ -77,6 +79,85 @@ export default function AdminEvents() {
   );
 }
 
+// Lets the admin search the real menu catalog and attach specific dishes
+// (with their real images) to an event, instead of typing free-text names.
+function DishPicker({ selected, onChange }) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return undefined;
+    }
+    setIsSearching(true);
+    const handle = setTimeout(() => {
+      getMenuItems({ search: query, limit: 8 })
+        .then((res) => setResults(res.data))
+        .catch(() => setResults([]))
+        .finally(() => setIsSearching(false));
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [query]);
+
+  function addDish(item) {
+    if (selected.some((d) => d._id === item._id)) return;
+    onChange([...selected, item]);
+    setQuery('');
+    setResults([]);
+  }
+
+  function removeDish(id) {
+    onChange(selected.filter((d) => d._id !== id));
+  }
+
+  return (
+    <div>
+      <div className="relative">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search dishes to add (e.g. Paneer Tikka)..."
+          className="form-input"
+        />
+        {query.trim() && (
+          <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-border-beige shadow-lg max-h-56 overflow-y-auto">
+            {isSearching && <p className="px-3 py-2 text-sm text-brown-muted">Searching...</p>}
+            {!isSearching && results.length === 0 && <p className="px-3 py-2 text-sm text-brown-muted">No dishes found.</p>}
+            {!isSearching && results.map((item) => (
+              <button
+                key={item._id}
+                type="button"
+                onClick={() => addDish(item)}
+                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-ivory text-left text-sm"
+              >
+                {item.image && <img src={item.image} alt="" className="w-8 h-8 object-cover shrink-0" />}
+                <span className="truncate">{item.name}</span>
+                {item.categoryId?.name && <span className="text-xs text-brown-muted ml-auto shrink-0">{item.categoryId.name}</span>}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {selected.map((item) => (
+            <span key={item._id} className="inline-flex items-center gap-1.5 bg-ivory border border-border-beige pl-1.5 pr-2 py-1 text-xs">
+              {item.image && <img src={item.image} alt="" className="w-6 h-6 object-cover shrink-0" />}
+              {item.name}
+              <button type="button" onClick={() => removeDish(item._id)} aria-label={`Remove ${item.name}`} className="text-error font-bold ml-1">
+                &times;
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function EventForm({ initialValues, onSubmit, onCancel }) {
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
@@ -85,6 +166,7 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       image: '', status: 'draft',
     },
   });
+  const [dishes, setDishes] = useState([]);
 
   useEffect(() => {
     if (initialValues) {
@@ -98,6 +180,9 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       setValue('menuHighlights', (initialValues.menuHighlights || []).join('\n'));
       setValue('image', initialValues.image || '');
       setValue('status', initialValues.status || 'draft');
+      setDishes(initialValues.dishes || []);
+    } else {
+      setDishes([]);
     }
   }, [initialValues, setValue]);
 
@@ -108,6 +193,7 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       ...values,
       endDateTime: values.endDateTime || undefined,
       menuHighlights: values.menuHighlights.split('\n').map((v) => v.trim()).filter(Boolean),
+      dishes: dishes.map((d) => d._id),
     });
   }
 
@@ -133,7 +219,14 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       <FormField label="Venue Address (optional)"><input {...register('venueAddress')} className="form-input" /></FormField>
 
       <FormField label="Description (optional)"><textarea {...register('description')} rows={3} className="form-input" /></FormField>
-      <FormField label="Menu Highlights (one dish per line)"><textarea {...register('menuHighlights')} rows={3} className="form-input" /></FormField>
+
+      <FormField label="Dishes at This Event">
+        <DishPicker selected={dishes} onChange={setDishes} />
+      </FormField>
+
+      <FormField label="Extra Menu Highlights (optional, one per line — for cuisines/notes not in the catalog)">
+        <textarea {...register('menuHighlights')} rows={2} className="form-input" />
+      </FormField>
 
       <ImageUploadField label="Event Image (optional)" value={image} onChange={(url) => setValue('image', url)} />
 

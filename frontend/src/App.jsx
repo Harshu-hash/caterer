@@ -17,6 +17,7 @@ import WeddingCatering from './pages/public/WeddingCatering';
 import Menu from './pages/public/Menu';
 import Packages from './pages/public/Packages';
 import Events from './pages/public/Events';
+import EventDetail from './pages/public/EventDetail';
 import Gallery from './pages/public/Gallery';
 import Reviews from './pages/public/Reviews';
 import Contact from './pages/public/Contact';
@@ -56,6 +57,7 @@ export default function App() {
                   <Route path="/menu" element={<Menu />} />
                   <Route path="/packages" element={<Packages />} />
                   <Route path="/events" element={<Events />} />
+                  <Route path="/events/:id" element={<EventDetail />} />
                   <Route path="/gallery" element={<Gallery />} />
                   <Route path="/reviews" element={<Reviews />} />
                   <Route path="/contact" element={<Contact />} />
