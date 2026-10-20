@@ -41,6 +41,11 @@ export default function Header() {
             className={`shrink-0 object-contain transition-all duration-300 ${isScrolled ? 'h-10 w-10' : 'h-12 w-12'}`}
           />
           <span
+            className={`sm:hidden font-logo gold-shine-text font-extrabold tracking-wide transition-all duration-300 min-w-0 truncate ${isScrolled ? 'text-sm' : 'text-base'}`}
+          >
+            SSS Caters and Supervision
+          </span>
+          <span
             className={`hidden sm:inline font-logo gold-shine-text font-extrabold tracking-wide transition-all duration-300 min-w-0 truncate ${isScrolled ? 'text-base lg:text-lg xl:text-xl' : 'text-lg lg:text-xl xl:text-2xl'}`}
           >
             {settings.businessName}

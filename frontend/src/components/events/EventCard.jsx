@@ -32,7 +32,7 @@ function LiveBadge() {
 function MenuChips({ highlights, max = 5 }) {
   if (!highlights?.length) return null;
   return (
-    <div className="flex flex-wrap gap-2 mt-4">
+    <div className="flex flex-wrap gap-2 mt-2">
       {highlights.slice(0, max).map((dish) => (
         <span key={dish} className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 bg-ivory border border-border-beige text-espresso">
           <PlateIcon className="w-3 h-3 text-gold" />
@@ -113,12 +113,12 @@ export default function EventCard({ event }) {
   return (
     <Link
       to={`/events/${event._id}`}
-      className="shine-hover card-elevated group relative bg-white border border-border-beige flex flex-col sm:flex-row overflow-hidden"
+      className="shine-hover card-elevated animate-card-blink group relative bg-white border flex flex-col sm:flex-row overflow-hidden"
     >
       {/* Date stub */}
-      <div className="sm:w-28 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-5 py-4 sm:py-6 relative z-10">
+      <div className="sm:w-24 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-4 py-3 sm:py-4 relative z-10">
         <span className="text-xs uppercase tracking-widest text-gold-light">{WEEKDAY_FMT.format(start)}</span>
-        <span className="font-display text-3xl sm:text-4xl font-bold leading-none">{DAY_FMT.format(start)}</span>
+        <span className="font-display text-2xl sm:text-3xl font-bold leading-none">{DAY_FMT.format(start)}</span>
         <span className="text-xs uppercase tracking-widest text-gold-light">{MONTH_FMT.format(start)}</span>
         {/* Perforated edge between the stub and the card body */}
         <span
@@ -132,7 +132,7 @@ export default function EventCard({ event }) {
 
       {/* Event photo */}
       {event.image && (
-        <div className="sm:w-44 h-40 sm:h-auto shrink-0 overflow-hidden relative">
+        <div className="sm:w-36 h-28 sm:h-auto shrink-0 overflow-hidden relative">
           <img
             src={event.image}
             alt={event.title}
@@ -143,13 +143,13 @@ export default function EventCard({ event }) {
         </div>
       )}
 
-      <div className="p-5 flex-1 flex flex-col min-w-0">
-        <div className="flex flex-wrap items-center gap-2 mb-2">
+      <div className="p-4 flex-1 flex flex-col min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
           {event.eventType && <span className="eyebrow">{event.eventType}</span>}
         </div>
-        <h3 className="font-display text-xl text-espresso mb-2 group-hover:text-maroon transition-colors">{event.title}</h3>
+        <h3 className="font-display text-lg text-espresso mb-1.5 group-hover:text-maroon transition-colors">{event.title}</h3>
 
-        <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-brown-muted">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-brown-muted">
           <span className="inline-flex items-center gap-1.5">
             <ClockIcon className="w-4 h-4 text-gold" /> {formatTimeRange(event.startDateTime, event.endDateTime)}
           </span>
@@ -157,17 +157,17 @@ export default function EventCard({ event }) {
             <PinIcon className="w-4 h-4 text-gold" /> {event.venueName}
           </span>
         </div>
-        {event.venueAddress && <p className="text-xs text-brown-muted mt-1">{event.venueAddress}</p>}
+        {event.venueAddress && <p className="text-xs text-brown-muted mt-0.5">{event.venueAddress}</p>}
 
-        {event.description && <p className="text-sm text-brown-muted mt-3">{event.description}</p>}
+        {event.description && <p className="text-sm text-brown-muted mt-2 line-clamp-2">{event.description}</p>}
 
-        <MenuChips highlights={highlights} />
+        <MenuChips highlights={highlights} max={3} />
 
-        {isPast && <p className="text-xs text-brown-muted mt-4 italic">This event has concluded.</p>}
+        {isPast && <p className="text-xs text-brown-muted mt-2 italic">This event has concluded.</p>}
 
-        <span className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-maroon group-hover:text-gold group-hover:gap-2.5 transition-all">
+        <span className="shine-auto inline-flex items-center gap-1.5 mt-3 self-start bg-maroon text-ivory text-xs font-semibold px-3.5 py-1.5 rounded-full transition-all group-hover:bg-gold group-hover:text-maroon group-hover:gap-2.5">
           View Details
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0">
             <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>

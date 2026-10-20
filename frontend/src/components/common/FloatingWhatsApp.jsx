@@ -8,10 +8,11 @@ export default function FloatingWhatsApp() {
   if (!whatsApp) return null;
 
   const digits = whatsApp.replace(/[^0-9]/g, '');
+  const message = encodeURIComponent("Hi! I'd like to know more about your catering services.");
 
   return (
     <a
-      href={`https://wa.me/${digits}`}
+      href={`https://wa.me/${digits}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"

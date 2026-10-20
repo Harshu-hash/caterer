@@ -8,6 +8,7 @@ import GalleryPreview from '../../components/home/GalleryPreview';
 import PackagesOverview from '../../components/home/PackagesOverview';
 import WhyChooseUs from '../../components/home/WhyChooseUs';
 import ReviewsCarousel from '../../components/home/ReviewsCarousel';
+import StatsBand from '../../components/home/StatsBand';
 import InquiryCTA from '../../components/home/InquiryCTA';
 
 export default function Home() {
@@ -27,6 +28,7 @@ export default function Home() {
       <PackagesOverview />
       <WhyChooseUs />
       <ReviewsCarousel />
+      <StatsBand />
       <InquiryCTA />
     </>
   );

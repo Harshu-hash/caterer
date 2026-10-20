@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { eventsApi } from '../../services/adminApi';
-import { getMenuItems } from '../../services/publicApi';
+import { getMenuItems, getMenuCategories } from '../../services/publicApi';
 import { useAdminResource } from '../../hooks/useAdminResource';
 import { useToast } from '../../components/common/Toast';
 import { extractErrorMessage } from '../../services/apiClient';
@@ -15,14 +15,32 @@ import ImageUploadField from '../../components/admin/ImageUploadField';
 import FormField from '../../components/admin/FormField';
 import { LoadingState, ErrorState } from '../../components/common/States';
 
-const DATE_FMT = new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+const DATE_FMT = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata',
+});
 
-// datetime-local inputs need "YYYY-MM-DDTHH:mm" in local time.
+// All events are in India, so event times are always entered and displayed
+// in IST — regardless of what timezone the admin's browser or the server
+// happens to be in. Without this, a bare "2026-11-01T10:00" string (what
+// datetime-local inputs give/expect) gets parsed as local-to-whatever-
+// machine-runs-the-code, which on a UTC server shifts it by 5.5 hours.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
+// Stored UTC ISO string -> "YYYY-MM-DDTHH:mm" for the datetime-local input,
+// rendered as IST regardless of the admin's own browser timezone.
 function toInputValue(isoString) {
   if (!isoString) return '';
-  const d = new Date(isoString);
+  const d = new Date(new Date(isoString).getTime() + IST_OFFSET_MS);
   const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+}
+
+// datetime-local value ("YYYY-MM-DDTHH:mm") -> explicit IST-offset ISO
+// string, so the backend parses the exact intended instant no matter what
+// timezone it's running in.
+function toIST(value) {
+  if (!value) return undefined;
+  return `${value}:00+05:30`;
 }
 
 export default function AdminEvents() {
@@ -79,66 +97,70 @@ export default function AdminEvents() {
   );
 }
 
-// Lets the admin search the real menu catalog and attach specific dishes
-// (with their real images) to an event, instead of typing free-text names.
+// Lets the admin attach specific dishes (with their real images) to an
+// event by first picking a menu category, then a dish within it — so
+// dishes from many categories can be added quickly without typing.
 function DishPicker({ selected, onChange }) {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categorySlug, setCategorySlug] = useState('');
+  const [items, setItems] = useState([]);
+  const [isLoadingItems, setIsLoadingItems] = useState(false);
 
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
+    getMenuCategories().then(setCategories).catch(() => setCategories([]));
+  }, []);
+
+  useEffect(() => {
+    if (!categorySlug) {
+      setItems([]);
       return undefined;
     }
-    setIsSearching(true);
-    const handle = setTimeout(() => {
-      getMenuItems({ search: query, limit: 8 })
-        .then((res) => setResults(res.data))
-        .catch(() => setResults([]))
-        .finally(() => setIsSearching(false));
-    }, 300);
-    return () => clearTimeout(handle);
-  }, [query]);
+    setIsLoadingItems(true);
+    getMenuItems({ category: categorySlug, limit: 200 })
+      .then((res) => setItems(res.data))
+      .catch(() => setItems([]))
+      .finally(() => setIsLoadingItems(false));
+  }, [categorySlug]);
 
-  function addDish(item) {
-    if (selected.some((d) => d._id === item._id)) return;
+  function addDish(id) {
+    const item = items.find((i) => i._id === id);
+    if (!item || selected.some((d) => d._id === item._id)) return;
     onChange([...selected, item]);
-    setQuery('');
-    setResults([]);
   }
 
   function removeDish(id) {
     onChange(selected.filter((d) => d._id !== id));
   }
 
+  const availableItems = items.filter((i) => !selected.some((d) => d._id === i._id));
+
   return (
     <div>
-      <div className="relative">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search dishes to add (e.g. Paneer Tikka)..."
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <select
+          value={categorySlug}
+          onChange={(e) => setCategorySlug(e.target.value)}
           className="form-input"
-        />
-        {query.trim() && (
-          <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-border-beige shadow-lg max-h-56 overflow-y-auto">
-            {isSearching && <p className="px-3 py-2 text-sm text-brown-muted">Searching...</p>}
-            {!isSearching && results.length === 0 && <p className="px-3 py-2 text-sm text-brown-muted">No dishes found.</p>}
-            {!isSearching && results.map((item) => (
-              <button
-                key={item._id}
-                type="button"
-                onClick={() => addDish(item)}
-                className="w-full flex items-center gap-3 px-3 py-2 hover:bg-ivory text-left text-sm"
-              >
-                {item.image && <img src={item.image} alt="" className="w-8 h-8 object-cover shrink-0" />}
-                <span className="truncate">{item.name}</span>
-                {item.categoryId?.name && <span className="text-xs text-brown-muted ml-auto shrink-0">{item.categoryId.name}</span>}
-              </button>
-            ))}
-          </div>
-        )}
+        >
+          <option value="">Select category...</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c.slug}>{c.name}</option>
+          ))}
+        </select>
+
+        <select
+          value=""
+          onChange={(e) => addDish(e.target.value)}
+          disabled={!categorySlug || isLoadingItems}
+          className="form-input disabled:opacity-60"
+        >
+          <option value="">
+            {!categorySlug ? 'Choose a category first' : isLoadingItems ? 'Loading dishes...' : 'Select dish to add...'}
+          </option>
+          {availableItems.map((item) => (
+            <option key={item._id} value={item._id}>{item.name}</option>
+          ))}
+        </select>
       </div>
 
       {selected.length > 0 && (
@@ -191,7 +213,8 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
   function submit(values) {
     return onSubmit({
       ...values,
-      endDateTime: values.endDateTime || undefined,
+      startDateTime: toIST(values.startDateTime),
+      endDateTime: toIST(values.endDateTime),
       menuHighlights: values.menuHighlights.split('\n').map((v) => v.trim()).filter(Boolean),
       dishes: dishes.map((d) => d._id),
     });
