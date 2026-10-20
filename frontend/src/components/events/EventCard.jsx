@@ -113,10 +113,10 @@ export default function EventCard({ event }) {
   return (
     <Link
       to={`/events/${event._id}`}
-      className="shine-hover card-elevated group bg-white border border-border-beige flex flex-col sm:flex-row overflow-hidden"
+      className="shine-hover card-elevated group relative bg-white border border-border-beige flex flex-col sm:flex-row overflow-hidden"
     >
       {/* Date stub */}
-      <div className="sm:w-28 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-5 py-4 sm:py-6 relative">
+      <div className="sm:w-28 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-5 py-4 sm:py-6 relative z-10">
         <span className="text-xs uppercase tracking-widest text-gold-light">{WEEKDAY_FMT.format(start)}</span>
         <span className="font-display text-3xl sm:text-4xl font-bold leading-none">{DAY_FMT.format(start)}</span>
         <span className="text-xs uppercase tracking-widest text-gold-light">{MONTH_FMT.format(start)}</span>
@@ -129,6 +129,19 @@ export default function EventCard({ event }) {
           }}
         />
       </div>
+
+      {/* Event photo */}
+      {event.image && (
+        <div className="sm:w-44 h-40 sm:h-auto shrink-0 overflow-hidden relative">
+          <img
+            src={event.image}
+            alt={event.title}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent sm:bg-gradient-to-r" />
+        </div>
+      )}
 
       <div className="p-5 flex-1 flex flex-col min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -151,6 +164,13 @@ export default function EventCard({ event }) {
         <MenuChips highlights={highlights} />
 
         {isPast && <p className="text-xs text-brown-muted mt-4 italic">This event has concluded.</p>}
+
+        <span className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-maroon group-hover:text-gold group-hover:gap-2.5 transition-all">
+          View Details
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0">
+            <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
       </div>
     </Link>
   );

@@ -68,18 +68,14 @@ export default function Events() {
         {upcomingEvents.length > 0 && (
           <div>
             <SectionHeading eyebrow="Mark Your Calendar" title="Upcoming Events" />
-            <div ref={timelineRef} className="relative pl-10 mt-10">
+            <div ref={timelineRef} className="relative mt-10 max-w-3xl mx-auto">
               <div
                 aria-hidden="true"
-                className={`timeline-line absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-gold via-border-beige to-transparent ${timelineVisible ? 'is-visible' : ''}`}
+                className={`timeline-line hidden sm:block absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-gold via-border-beige to-transparent ${timelineVisible ? 'is-visible' : ''}`}
               />
-              <div className="space-y-6">
+              <div className="space-y-6 sm:pl-10">
                 {upcomingEvents.map((event, i) => (
                   <Reveal key={event._id} delay={200 + (i % 6) * 120} className="relative">
-                    <span className="absolute left-[-27px] top-7 flex h-3 w-3" aria-hidden="true">
-                      <span className="absolute inline-flex h-full w-full rounded-full bg-gold opacity-60 animate-ping-slow" />
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-gold ring-4 ring-ivory shadow" />
-                    </span>
                     <EventCard event={event} />
                   </Reveal>
                 ))}
