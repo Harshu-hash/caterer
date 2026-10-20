@@ -7,8 +7,12 @@ import { generateUniqueSlug } from '../utils/slugify.js';
 /**
  * Builds standard admin CRUD handlers for a content model.
  * `slugSource` names the field slugs should be derived from when absent (e.g. "title" or "name").
+ * Leave it unset (null) for models that don't have a `slug` path in their schema at all — passing
+ * a `slugSource` for one of those would try to query/write a field Mongoose doesn't know about,
+ * which (combined with `strictQuery`) silently strips it from filters and can hang
+ * `generateUniqueSlug`'s loop forever instead of erroring.
  */
-export function buildAdminCrud(Model, schema, { slugSource = 'name', populate = null } = {}) {
+export function buildAdminCrud(Model, schema, { slugSource = null, populate = null } = {}) {
   const list = asyncHandler(async (req, res) => {
     const { page, limit, skip } = getPagination(req.query, { defaultLimit: 20, maxLimit: 100 });
     const filter = {};
@@ -31,10 +35,8 @@ export function buildAdminCrud(Model, schema, { slugSource = 'name', populate = 
 
   const create = asyncHandler(async (req, res) => {
     const data = { ...req.body };
-    if (!data.slug) {
-      data.slug = await generateUniqueSlug(Model, data[slugSource] || 'item');
-    } else {
-      data.slug = await generateUniqueSlug(Model, data.slug);
+    if (slugSource) {
+      data.slug = await generateUniqueSlug(Model, data.slug || data[slugSource] || 'item');
     }
     const item = await Model.create(data);
     ok(res, item, 'Created successfully', 201);
@@ -55,7 +57,7 @@ export function buildAdminCrud(Model, schema, { slugSource = 'name', populate = 
       if (!sentKeys.has(key)) delete data[key];
     }
 
-    if (data.slug) {
+    if (slugSource && data.slug) {
       data.slug = await generateUniqueSlug(Model, data.slug, existing._id);
     }
 

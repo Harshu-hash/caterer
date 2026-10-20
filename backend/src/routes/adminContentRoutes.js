@@ -50,9 +50,10 @@ registerCrudRoutes('/menu-items', MenuItem, menuItemSchema, {
 registerCrudRoutes('/packages', Package, packageSchema, { slugSource: 'name' });
 registerCrudRoutes('/gallery', GalleryItem, galleryItemSchema, { slugSource: 'title' });
 registerCrudRoutes('/events', Event, eventSchema, {
-  slugSource: 'title',
+  // No slugSource: Event has no `slug` field in its schema (it's linked to
+  // publicly by _id, not slug) — see the warning in adminCrudFactory.js.
   populate: { path: 'dishes', select: 'name image dietaryTags' },
 });
-registerCrudRoutes('/reviews', Review, reviewSchema, { slugSource: 'name' });
+registerCrudRoutes('/reviews', Review, reviewSchema); // Review has no `slug` field either.
 
 export default router;
