@@ -113,7 +113,7 @@ export default function EventCard({ event }) {
   return (
     <Link
       to={`/events/${event._id}`}
-      className="shine-hover card-elevated animate-card-blink group relative bg-white border flex flex-col sm:flex-row overflow-hidden"
+      className="shine-auto card-elevated animate-card-blink group relative bg-white border flex flex-col sm:flex-row overflow-hidden"
     >
       {/* Date stub */}
       <div className="sm:w-24 shrink-0 bg-maroon text-ivory flex sm:flex-col items-center justify-center gap-2 sm:gap-0 px-4 py-3 sm:py-4 relative z-10">
