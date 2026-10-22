@@ -124,9 +124,7 @@ export const listEvents = asyncHandler(async (req, res) => {
 });
 
 export const getEventById = asyncHandler(async (req, res) => {
-  const event = await Event.findOne({ _id: req.params.id, status: 'published' })
-    .populate('dishes', 'name slug image description cuisine dietaryTags price')
-    .lean();
+  const event = await Event.findOne({ _id: req.params.id, status: 'published' }).lean();
   if (!event) throw new ApiError(404, 'Event not found');
 
   ok(res, withTimingStatus(event));

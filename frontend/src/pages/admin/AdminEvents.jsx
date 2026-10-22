@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { eventsApi } from '../../services/adminApi';
-import { getMenuItems, getMenuCategories } from '../../services/publicApi';
+import { eventsApi, mediaApi } from '../../services/adminApi';
 import { useAdminResource } from '../../hooks/useAdminResource';
 import { useToast } from '../../components/common/Toast';
 import { extractErrorMessage } from '../../services/apiClient';
@@ -64,7 +63,11 @@ export default function AdminEvents() {
               { key: 'title', header: 'Title' },
               { key: 'startDateTime', header: 'Date & Time', render: (r) => DATE_FMT.format(new Date(r.startDateTime)) },
               { key: 'venueName', header: 'Venue' },
-              { key: 'dishes', header: 'Dishes', render: (r) => r.dishes?.length || 0 },
+              {
+                key: 'dishes',
+                header: 'Dishes',
+                render: (r) => r.dishSections?.reduce((sum, s) => sum + (s.dishes?.length || 0), 0) || 0,
+              },
               { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
               {
                 key: 'actions', header: '', render: (r) => (
@@ -97,85 +100,115 @@ export default function AdminEvents() {
   );
 }
 
-// Lets the admin attach specific dishes (with their real images) to an
-// event by first picking a menu category, then a dish within it — so
-// dishes from many categories can be added quickly without typing.
-function DishPicker({ selected, onChange }) {
-  const [categories, setCategories] = useState([]);
-  const [categorySlug, setCategorySlug] = useState('');
-  const [items, setItems] = useState([]);
-  const [isLoadingItems, setIsLoadingItems] = useState(false);
+// Compact inline image uploader for a single dish row (ImageUploadField's
+// own preview is full-width/h-40, too large to repeat per dish here).
+function DishThumbUpload({ value, onChange }) {
+  const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    getMenuCategories().then(setCategories).catch(() => setCategories([]));
-  }, []);
-
-  useEffect(() => {
-    if (!categorySlug) {
-      setItems([]);
-      return undefined;
+  async function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    try {
+      const media = await mediaApi.upload(file);
+      onChange(media.url);
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
     }
-    setIsLoadingItems(true);
-    getMenuItems({ category: categorySlug, limit: 200 })
-      .then((res) => setItems(res.data))
-      .catch(() => setItems([]))
-      .finally(() => setIsLoadingItems(false));
-  }, [categorySlug]);
-
-  function addDish(id) {
-    const item = items.find((i) => i._id === id);
-    if (!item || selected.some((d) => d._id === item._id)) return;
-    onChange([...selected, item]);
   }
-
-  function removeDish(id) {
-    onChange(selected.filter((d) => d._id !== id));
-  }
-
-  const availableItems = items.filter((i) => !selected.some((d) => d._id === i._id));
 
   return (
-    <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <select
-          value={categorySlug}
-          onChange={(e) => setCategorySlug(e.target.value)}
-          className="form-input"
-        >
-          <option value="">Select category...</option>
-          {categories.map((c) => (
-            <option key={c._id} value={c.slug}>{c.name}</option>
-          ))}
-        </select>
+    <label className="shrink-0 w-14 h-14 border border-dashed border-border-beige bg-ivory flex items-center justify-center cursor-pointer overflow-hidden relative">
+      {value && <img src={value} alt="" className="w-full h-full object-cover" />}
+      {!value && <span className="text-[10px] text-brown-muted text-center px-1">{isUploading ? '...' : 'Photo'}</span>}
+      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} className="sr-only" />
+    </label>
+  );
+}
 
-        <select
-          value=""
-          onChange={(e) => addDish(e.target.value)}
-          disabled={!categorySlug || isLoadingItems}
-          className="form-input disabled:opacity-60"
-        >
-          <option value="">
-            {!categorySlug ? 'Choose a category first' : isLoadingItems ? 'Loading dishes...' : 'Select dish to add...'}
-          </option>
-          {availableItems.map((item) => (
-            <option key={item._id} value={item._id}>{item.name}</option>
-          ))}
-        </select>
-      </div>
+// Lets the admin build the event's own menu display from scratch: any
+// number of custom sections (e.g. "Starters", "Main Course"), each with its
+// own heading and its own list of dishes typed in with a name + photo —
+// not tied to the shared menu catalog.
+function DishSectionsEditor({ sections, onChange }) {
+  function updateSection(index, patch) {
+    onChange(sections.map((s, i) => (i === index ? { ...s, ...patch } : s)));
+  }
 
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3">
-          {selected.map((item) => (
-            <span key={item._id} className="inline-flex items-center gap-1.5 bg-ivory border border-border-beige pl-1.5 pr-2 py-1 text-xs">
-              {item.image && <img src={item.image} alt="" className="w-6 h-6 object-cover shrink-0" />}
-              {item.name}
-              <button type="button" onClick={() => removeDish(item._id)} aria-label={`Remove ${item.name}`} className="text-error font-bold ml-1">
-                &times;
-              </button>
-            </span>
-          ))}
+  function removeSection(index) {
+    onChange(sections.filter((_, i) => i !== index));
+  }
+
+  function addSection() {
+    onChange([...sections, { heading: '', dishes: [] }]);
+  }
+
+  function addDish(sectionIndex) {
+    updateSection(sectionIndex, { dishes: [...sections[sectionIndex].dishes, { name: '', image: '' }] });
+  }
+
+  function updateDish(sectionIndex, dishIndex, patch) {
+    const dishes = sections[sectionIndex].dishes.map((d, i) => (i === dishIndex ? { ...d, ...patch } : d));
+    updateSection(sectionIndex, { dishes });
+  }
+
+  function removeDish(sectionIndex, dishIndex) {
+    updateSection(sectionIndex, { dishes: sections[sectionIndex].dishes.filter((_, i) => i !== dishIndex) });
+  }
+
+  return (
+    <div className="space-y-4">
+      {sections.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="border border-border-beige bg-ivory/40 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <input
+              value={section.heading}
+              onChange={(e) => updateSection(sectionIndex, { heading: e.target.value })}
+              placeholder="Section heading (e.g. Starters, Main Course)"
+              className="form-input flex-1 font-medium"
+            />
+            <button
+              type="button"
+              onClick={() => removeSection(sectionIndex)}
+              aria-label="Remove section"
+              className="text-error text-sm font-semibold px-2 shrink-0"
+            >
+              Remove
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {section.dishes.map((dish, dishIndex) => (
+              <div key={dishIndex} className="flex items-center gap-2">
+                <DishThumbUpload value={dish.image} onChange={(url) => updateDish(sectionIndex, dishIndex, { image: url })} />
+                <input
+                  value={dish.name}
+                  onChange={(e) => updateDish(sectionIndex, dishIndex, { name: e.target.value })}
+                  placeholder="Dish name"
+                  className="form-input flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeDish(sectionIndex, dishIndex)}
+                  aria-label={`Remove ${dish.name || 'dish'}`}
+                  className="text-error font-bold px-2 shrink-0"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button type="button" onClick={() => addDish(sectionIndex)} className="btn-secondary text-sm">
+            + Add Dish
+          </button>
         </div>
-      )}
+      ))}
+
+      <button type="button" onClick={addSection} className="btn-secondary text-sm">
+        + Add Dish Section
+      </button>
     </div>
   );
 }
@@ -188,7 +221,7 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       image: '', status: 'draft',
     },
   });
-  const [dishes, setDishes] = useState([]);
+  const [dishSections, setDishSections] = useState([]);
 
   useEffect(() => {
     if (initialValues) {
@@ -202,9 +235,9 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       setValue('menuHighlights', (initialValues.menuHighlights || []).join('\n'));
       setValue('image', initialValues.image || '');
       setValue('status', initialValues.status || 'draft');
-      setDishes(initialValues.dishes || []);
+      setDishSections(initialValues.dishSections || []);
     } else {
-      setDishes([]);
+      setDishSections([]);
     }
   }, [initialValues, setValue]);
 
@@ -216,7 +249,9 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
       startDateTime: toIST(values.startDateTime),
       endDateTime: toIST(values.endDateTime),
       menuHighlights: values.menuHighlights.split('\n').map((v) => v.trim()).filter(Boolean),
-      dishes: dishes.map((d) => d._id),
+      dishSections: dishSections
+        .filter((s) => s.heading.trim())
+        .map((s) => ({ heading: s.heading.trim(), dishes: s.dishes.filter((d) => d.name.trim()) })),
     });
   }
 
@@ -243,8 +278,8 @@ function EventForm({ initialValues, onSubmit, onCancel }) {
 
       <FormField label="Description (optional)"><textarea {...register('description')} rows={3} className="form-input" /></FormField>
 
-      <FormField label="Dishes at This Event">
-        <DishPicker selected={dishes} onChange={setDishes} />
+      <FormField label="Dish Sections (optional — organize dishes under custom headings)">
+        <DishSectionsEditor sections={dishSections} onChange={setDishSections} />
       </FormField>
 
       <FormField label="Extra Menu Highlights (optional, one per line — for cuisines/notes not in the catalog)">

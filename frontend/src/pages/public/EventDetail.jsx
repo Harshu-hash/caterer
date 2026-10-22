@@ -10,7 +10,6 @@ import { LoadingState, ErrorState } from '../../components/common/States';
 import { PinIcon, ClockIcon, PlateIcon } from '../../components/events/icons';
 import { getEventById } from '../../services/publicApi';
 
-const DIET_LABEL = { veg: 'Veg', 'non-veg': 'Non-Veg', egg: 'Egg', jain: 'Jain', vegan: 'Vegan' };
 const DATE_FMT = new Intl.DateTimeFormat('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 const TIME_FMT = new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true });
 
@@ -56,7 +55,7 @@ export default function EventDetail() {
 
   const isLive = event.timingStatus === 'live';
   const isPast = event.timingStatus === 'past';
-  const dishes = event.dishes || [];
+  const dishSections = event.dishSections || [];
 
   return (
     <>
@@ -101,38 +100,33 @@ export default function EventDetail() {
               </Reveal>
             )}
 
-            {dishes.length > 0 && (
-              <div>
-                <SectionHeading eyebrow="On the Menu" title="Dishes at This Event" />
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {dishes.map((dish, i) => (
-                    <Reveal key={dish._id} delay={(i % 6) * 70}>
-                      <div className="card-elevated bg-white border border-border-beige flex overflow-hidden">
-                        {dish.image && (
-                          <div className="w-28 shrink-0 overflow-hidden">
-                            <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" loading="lazy" />
+            {dishSections.length > 0 && (
+              <div className="space-y-10">
+                {dishSections.map((section, sectionIndex) => (
+                  <div key={section.heading + sectionIndex}>
+                    <SectionHeading eyebrow={sectionIndex === 0 ? 'On the Menu' : undefined} title={section.heading} />
+                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {section.dishes.map((dish, i) => (
+                        <Reveal key={dish.name + i} delay={(i % 6) * 70}>
+                          <div className="card-elevated bg-white border border-border-beige flex overflow-hidden">
+                            {dish.image && (
+                              <div className="w-28 shrink-0 overflow-hidden bg-ivory">
+                                <img src={dish.image} alt={dish.name} className="w-full h-full object-contain" loading="lazy" />
+                              </div>
+                            )}
+                            <div className="p-4 min-w-0 flex-1 flex items-center">
+                              <h3 className="font-display text-lg text-espresso truncate">{dish.name}</h3>
+                            </div>
                           </div>
-                        )}
-                        <div className="p-4 min-w-0 flex-1">
-                          <h3 className="font-display text-lg text-espresso truncate">{dish.name}</h3>
-                          {dish.cuisine && <p className="text-xs text-brown-muted mt-0.5">{dish.cuisine}</p>}
-                          <div className="flex flex-wrap gap-1.5 mt-2">
-                            {dish.dietaryTags?.map((tag) => (
-                              <span key={tag} className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 bg-ivory border border-border-beige text-espresso">
-                                <PlateIcon className="w-3 h-3 text-gold" />
-                                {DIET_LABEL[tag] || tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </Reveal>
-                  ))}
-                </div>
+                        </Reveal>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
-            {dishes.length === 0 && event.menuHighlights?.length > 0 && (
+            {dishSections.length === 0 && event.menuHighlights?.length > 0 && (
               <div>
                 <SectionHeading eyebrow="On the Menu" title="Menu Highlights" />
                 <div className="flex flex-wrap gap-2 mt-6">

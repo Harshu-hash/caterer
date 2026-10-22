@@ -49,11 +49,11 @@ registerCrudRoutes('/menu-items', MenuItem, menuItemSchema, {
 });
 registerCrudRoutes('/packages', Package, packageSchema, { slugSource: 'name' });
 registerCrudRoutes('/gallery', GalleryItem, galleryItemSchema, { slugSource: 'title' });
-registerCrudRoutes('/events', Event, eventSchema, {
-  // No slugSource: Event has no `slug` field in its schema (it's linked to
-  // publicly by _id, not slug) — see the warning in adminCrudFactory.js.
-  populate: { path: 'dishes', select: 'name image dietaryTags' },
-});
+// No slugSource: Event has no `slug` field in its schema (it's linked to
+// publicly by _id, not slug) — see the warning in adminCrudFactory.js.
+// dishSections are custom, admin-typed dish entries embedded directly on
+// the event document, not references, so no populate is needed.
+registerCrudRoutes('/events', Event, eventSchema);
 registerCrudRoutes('/reviews', Review, reviewSchema); // Review has no `slug` field either.
 
 export default router;
