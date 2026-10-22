@@ -61,7 +61,7 @@ export function FeaturedEventCard({ event }) {
             'conic-gradient(from 0deg, var(--color-gold) 0%, var(--color-gold-bright) 20%, transparent 45%, transparent 55%, var(--color-gold) 80%, var(--color-gold-bright) 100%)',
         }}
       />
-      <div className="shine-hover wine-surface text-ivory shadow-[0_0_45px_-12px_var(--color-gold-bright)]">
+      <div className="shine-auto wine-surface text-ivory shadow-[0_0_45px_-12px_var(--color-gold-bright)]">
         <div className="relative grid md:grid-cols-5">
           {event.image && (
             <div className="md:col-span-2 aspect-[16/9] md:aspect-auto relative overflow-hidden">
